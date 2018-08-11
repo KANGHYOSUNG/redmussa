@@ -13,5 +13,5 @@ class Cardgame extends CI_Model {
         $data=$this->db->get();
         return $data->result();
     }
-}  
+}
 ?>
