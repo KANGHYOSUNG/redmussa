@@ -41,15 +41,15 @@
     <div id="content">
     	<div class="tableList">
             <? foreach($table as $game => $seats) {?>
-            <div class="btnCntL">
-    			<a href="">저장</a>
-    		</div>
             <div class="tableCnt">
+                <div class="btnCntL">
+                    <a href="" class="btnSave">저장</a>
+                </div>
         		<h3 class="tableNum"><?=$game?></h3>
         		<ul>
-                    <? foreach($seats as $num => $seat) { ?>
-        			<li><a href="" class="<?=($seat==1)?'on':''?>"><?=$num?></a></li>
-                    <? } ?>
+                    <? $seatCount=1; foreach($seats as $num => $seat) { ?>
+        			<li><a href="" table-seat-num=<?=$num?> class="<?=($seat==1)?'on':''?>"><?=$seatCount;?></a></li>
+                    <? $seatCount++; } ?>
         		</ul>
         	</div>
          <? } ?>
@@ -61,5 +61,54 @@
 </body>
 </html>
 <script>
+$(".tableCnt ul li a").bind("click", function(e){
+    if( $(this).hasClass("on") ){
+        $(this).removeClass("on");
+    } else {
+        $(this).addClass("on");
+    }
+    e.preventDefault();
+});
+
+$(".tableCnt .btnSave").bind("click", function(e){
+
+    var emIndex = $(".tableList .btnSave").index( $(this) );
+    var emUl = $(".tableList ul").eq( emIndex );
+    var emTalbeNum = $(".tableList .tableNum").eq( emIndex ).text();
+
+    var addArray = "";
+    var removeArray = "";
+
+    for( var i = 0; i < emUl.find("li").length; i++ ){
+        var clickEm = emUl.find("li").eq( i ).find("a");
+
+        if( emUl.find("li").eq( i ).find("a").hasClass("on") ){
+            //console.log( "add", clickEm.text() )
+            addArray += clickEm.attr("table-seat-num") + ",";
+            //addArray += emTalbeNum + "_" + clickEm.text() + ",";
+        } else {
+            //console.log( "remove", clickEm.text() )
+            removeArray += clickEm.attr("table-seat-num") + ",";
+            //removeArray += emTalbeNum + "_" + clickEm.text() + ",";
+        }
+    }
+
+    console.log(addArray)
+    console.log(removeArray)
+
+    $.ajax({
+        url: './game',
+        data: { add: addArray, remove: removeArray },
+        type: "POST",
+        success: function(data, e, d) {
+            //data = data.split(" ").join("");
+            location.href = "./game";
+            //console.log(data);
+            alert('저장 완료!')
+        }
+    });
+    e.preventDefault();
+});
+
 
 </script>

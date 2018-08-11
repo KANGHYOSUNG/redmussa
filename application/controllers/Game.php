@@ -1,7 +1,10 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
+use Restserver\Libraries\REST_Controller;
+require APPPATH . 'libraries/REST_Controller.php';
+require APPPATH . 'libraries/Format.php';
 
-class Game extends CI_Controller {
+class Game extends REST_Controller {
 
 	const GAME_TABLE_START = 50;
 	const GAME_TABLE_END = 72;
@@ -11,32 +14,38 @@ class Game extends CI_Controller {
 
 	private $seat_other = [50,59,62,63,64];
 
-	function __construct()
-	{
-		parent::__construct();
-	}
+	function __construct($config = 'rest') {
+        parent::__construct($config);
+		$this->load->model('sl_table');
+    }
 
-	function index() {
-		$data = self::standard();
+	function index_get() {
+		$data = self::table();
 		$this->load->view('list' , $data);
 	}
 
-	public function standard() {
-
-		$seats = [
-			"table_start"=> self::GAME_TABLE_START,
-			"table_end"=> self::GAME_TABLE_END,
-			"table"=> self::table()
+	function index_post() {
+		$message = [
+			"add" => $this->post("add"),
+			"remove" => $this->input->post("remove")
 		];
-		return $seats;
+		$result = $this->sl_table->updateSeat($message);
+		if(empty($result)) {
+			$this->response('fail update', 500);
+		} else {
+			$this->response('success', 200);	
+		}
 	}
 
-	public function winner() {
-		$this->load->model('sl_table');
-		return explode(",", $this->sl_table->selectAll());
+	function health() {
+		//var_dump( site_url() );
 	}
 
-	public function seat($game) {
+	private function winner() {
+		return explode(",", $this->sl_table->selectSeatByAll());
+	}
+
+	private function seat($game) {
 		$winnner = self::winner();
 		if(in_array($game , $this->seat_other)) {
 			$seat_max = self::SEAT_END_OTHER;
@@ -46,19 +55,26 @@ class Game extends CI_Controller {
 
 		for($seat = self::SEAT_START ; $seat <= $seat_max ; $seat++ ) {
 			if(in_array( $game.'_'.$seat , $winnner)) {
-				$arrSeat[$seat] = 1;
+				$arrSeat[$game.'_'.$seat] = 1;
 			} else {
-				$arrSeat[$seat] = 0;
+				$arrSeat[$game.'_'.$seat] = 0;
 			}
 		}
 		return $arrSeat;
 	}
 
-	public function table() {
+	private function table() {
 
 		for($game = self::GAME_TABLE_START ; $game <= self::GAME_TABLE_END ; $game++) {
 			$table[$game] = self::seat($game);
 		}
-		return $table;
+
+		$seats = [
+			"table_start"=> self::GAME_TABLE_START,
+			"table_end"=> self::GAME_TABLE_END,
+			"table"=> $table
+		];
+		return $seats;
 	}
+
 }
