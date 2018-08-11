@@ -11,7 +11,7 @@ class Sl_table extends CI_Model {
         $this->db->select('*');
         $this->db->from('sl_table');
         $data=$this->db->get();
-        return $data->result();
+        return $data->result_array()[0]['table_date'];
     }
 }
 ?>
