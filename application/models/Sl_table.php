@@ -17,10 +17,9 @@ class Sl_table extends CI_Model {
     public function updateSeat($data) {
 
         $winnerseat =$this->selectSeatByAll();
-
-		$intens = array_diff(explode(",", $winnerseat) , explode(",", $data['remove']));
-		$intens = array_diff($intens,explode(",", $data['add']));
-		$seats = implode(array_merge( $intens, explode(",", $data['add'])) , ",");
+	$intens = array_diff(explode(",", $winnerseat) , explode(",", $data['remove']));
+	$intens = array_diff($intens,explode(",", $data['add']));
+	$seats = implode(array_merge( $intens, explode(",", $data['add'])) , ",");
 
         $this->db->set('table_date', $seats);
         $this->db->set('red_update_state', 'true');
