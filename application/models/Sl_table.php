@@ -15,8 +15,8 @@ class Sl_table extends CI_Model {
     }
 
     public function updateSeat($data) {
-
-        $winnerseat =$this->selectSeatByAll();
+	 
+	$winnerseat =$this->selectSeatByAll();
 	$intens = array_diff(explode(",", $winnerseat) , explode(",", $data['remove']));
 	$intens = array_diff($intens,explode(",", $data['add']));
 	$seats = implode(array_merge( $intens, explode(",", $data['add'])) , ",");
