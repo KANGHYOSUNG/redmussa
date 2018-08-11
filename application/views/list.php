@@ -109,6 +109,4 @@ $(".tableCnt .btnSave").bind("click", function(e){
     });
     e.preventDefault();
 });
-
-
 </script>
